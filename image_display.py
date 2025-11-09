@@ -13,12 +13,12 @@ class ImageDisplay:
         self.max_zoom = 10.0
         self.pan_step = 20
         self.border_left = Coordinates(0, 0)
-        self.wid_display, self.hei_display = self.manager.img_display.size
+        self.wid_display, self.hei_display = self.manager.handler.img_display.size
         self.border_right = Coordinates(self.wid_display, self.hei_display)
         self.center = Coordinates(self.wid_display // 2, self.hei_display // 2)
 
     def calculate_image_bounds(self):
-        img = self.manager.img_display
+        img = self.manager.handler.img_modified
         img_w, img_h = img.size
 
         wid_display = int(img_w / self.zoom_factor)
@@ -45,12 +45,12 @@ class ImageDisplay:
         return display_img
 
     def get_pixel_value(self, coords: Coordinates):
-        img = self.manager.img_modified
+        img = self.manager.handler.img_modified
         if not img:
             return None
 
         pixel = img.getpixel(coords)
-        if self.manager.grayscale:
+        if self.manager.is_image_grayscale(img):
             pixel = (pixel, pixel, pixel)
         return pixel
 

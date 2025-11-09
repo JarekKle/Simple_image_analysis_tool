@@ -6,13 +6,11 @@ from PIL import ImageTk
 from coordinates import Coordinates
 from image_display import ImageDisplay
 from image_manager import ImageManager
-from image_processor import ImageProcessor
 
 
 class AppWindow:
-    def __init__(self, manager: ImageManager, processor: ImageProcessor, display: ImageDisplay):
+    def __init__(self, manager: ImageManager, display: ImageDisplay):
         self.manager = manager
-        self.processor = processor
         self.display = display
         self.master = Tk()
         self.photo = None
@@ -51,7 +49,7 @@ class AppWindow:
         self.update_status_bar()
 
     def get_pixel_value(self, event):
-        width, height = self.manager.img_display.size
+        width, height = self.manager.handler.img_display.size
         if 0 <= event.x < width and 0 <= event.y < height:
             self.current_pixel_coords = Coordinates(event.x, event.y)
             self.calculate_real_pixel_coords()
@@ -65,7 +63,7 @@ class AppWindow:
         self.real_pixel_coords = Coordinates(int(border_left.x + x // zoom), int(border_left.y + y // zoom))
 
     def change_pixel_color(self, event):
-        self.processor.change_pixel_color(self.real_pixel_coords)
+        self.manager.handler.change_pixel_color(self.real_pixel_coords)
         self.update_window()
 
     def _setup_window(self):
@@ -76,8 +74,8 @@ class AppWindow:
         self._setup_events()
 
     def _setup_canvas(self):
-        width, height = self.manager.img_modified.size
-        self.photo = ImageTk.PhotoImage(self.manager.img_modified)
+        width, height = self.manager.handler.img_modified.size
+        self.photo = ImageTk.PhotoImage(self.manager.handler.img_modified)
         self.image_label = tk.Label(self.master, image=self.photo, width=width, height=height)
         self.image_label.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
@@ -109,8 +107,8 @@ class AppWindow:
         button_frame = tk.Frame(controls_frame)
         button_frame.pack(side=tk.TOP, pady=10, fill=tk.X)
 
-        self.button_restore_image = tk.Button(button_frame, text="Restore original image", width=18)
-        self.button_restore_image.pack(side=tk.TOP, fill=tk.X, pady=2)
+        self.button_restore_original = tk.Button(button_frame, text="Restore original image", width=18)
+        self.button_restore_original.pack(side=tk.TOP, fill=tk.X, pady=2)
 
         self.button_adjust_brightness = tk.Button(button_frame, text="Adjust brightness", width=18)
         self.button_adjust_brightness.pack(side=tk.TOP, fill=tk.X, pady=2)
@@ -150,7 +148,7 @@ class AppWindow:
         self.button_zoom_in.config(command=lambda: self.zoom(1))
         self.button_zoom_out.config(command=lambda: self.zoom(-1))
 
-        self.button_restore_image.config(command=self.restore_image)
+        self.button_restore_original.config(command=self.restore_original)
         self.button_adjust_brightness.config(command=self.adjust_brightness)
         self.button_display_histogram.config(command=self.display_histogram)
         self.button_stretch_histogram.config(command=self.stretch_histogram)
@@ -158,32 +156,32 @@ class AppWindow:
         self.button_linear_filters.config(command=self.linear_filters)
         self.button_median_filter.config(command=self.median_filter)
 
-    def restore_image(self):
-        self.processor.restore_image()
+    def restore_original(self):
+        self.manager.handler.restore_original()
         self.update_window()
 
     def adjust_brightness(self):
-        self.processor.adjust_brightness()
+        self.manager.handler.adjust_brightness()
         self.update_window()
 
     def display_histogram(self):
-        self.processor.display_histogram()
+        self.manager.handler.display_histogram()
         self.update_window()
 
     def stretch_histogram(self):
-        self.processor.stretch_histogram()
+        self.manager.handler.stretch_histogram()
         self.update_window()
 
     def equalize_histogram(self):
-        self.processor.equalize_histogram()
+        self.manager.handler.equalize_histogram()
         self.update_window()
 
     def linear_filters(self):
-        self.processor.linear_filters()
+        self.manager.handler.linear_filters()
         self.update_window()
 
     def median_filter(self):
-        self.processor.median_filter()
+        self.manager.handler.median_filter()
         self.update_window()
 
     def run(self):

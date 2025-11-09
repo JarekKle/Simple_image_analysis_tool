@@ -5,13 +5,13 @@ import cairosvg
 import numpy as np
 from PIL import Image
 
+from color_image_handler import ColorImageHandler
+from grayscale_image_handler import GrayscaleImageHandler
+
 
 class ImageManager:
     def __init__(self):
-        self.img_original = None
-        self.img_modified = None
-        self.img_display = None
-        self.grayscale = False
+        self.handler = None
 
     def load_image(self, img_name=None):
         if img_name is None:
@@ -34,33 +34,26 @@ class ImageManager:
             except Exception as e:
                 raise TypeError(f"Nie udało się otworzyć obrazu: {e}")
 
-        self.img_modified = img.copy()
+        self._assign_handler(img)
+        return self.handler.img_modified
 
-        if self.is_image_grayscale():
-            img = img.convert("L")
-            self.grayscale = True
+    def replace_image(self, new_img):
+        self._assign_handler(new_img)
+
+    def _assign_handler(self, img):
+        if self.is_image_grayscale(img):
+            self.handler = GrayscaleImageHandler(img)
         else:
-            self.grayscale = False
-
-        self.img_original = img.copy()
-        self.img_modified = img.copy()
-        self.img_display = img.copy()
-
-        return self.img_modified
+            self.handler = ColorImageHandler(img)
 
     def save_image(self, img_name=None):
         return
 
-    def is_image_grayscale(self):
-        img = self.img_modified
-        if not img:
-            return None
-        mode = img.mode
-        if mode in ("L", "LA"):
+    @staticmethod
+    def is_image_grayscale(img):
+        if img.mode == "L":
             return True
-        if mode in ("RGB", "RGBA"):
+        if img.mode in ("RGB", "RGBA"):
             arr = np.array(img)
-            if arr.ndim == 3 and arr.shape[2] >= 3:
-                r, g, b = arr[..., 0], arr[..., 1], arr[..., 2]
-                return np.array_equal(r, g) and np.array_equal(g, b)
+            return np.allclose(arr[..., 0], arr[..., 1]) and np.allclose(arr[..., 1], arr[..., 2])
         return False
