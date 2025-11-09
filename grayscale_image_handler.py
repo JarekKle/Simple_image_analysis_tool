@@ -1,15 +1,18 @@
 from tkinter import messagebox
 
+import numpy as np
+
 from base_image_handler import BaseImageHandler
 from coordinates import Coordinates
 import tkinter as tk
+from PIL import Image
 
 
 class GrayscaleImageHandler(BaseImageHandler):
-    def __init__(self, img):
-        self.img_original = img.convert("L")
-        self.img_modified = self.img_original.copy()
-        self.img_display = self.img_original.copy()
+
+    def convert_to_grayscale(self):
+        return self
+
     def change_pixel_color(self, coords: Coordinates):
         root = tk.Toplevel()
         root.title("Wprowadź nowy kolor")
@@ -33,3 +36,14 @@ class GrayscaleImageHandler(BaseImageHandler):
         tk.Button(root, text="OK", command=apply_color).grid(row=3, column=0, columnspan=2)
         root.grab_set()
         root.wait_window()
+
+    def stretch_histogram(self):
+        arr = np.array(self.img_modified).astype(np.float32)
+        ch_min, ch_max = np.min(arr), np.max(arr)
+        if ch_max > ch_min:
+            stretched = ((arr - ch_min) / (ch_max - ch_min) * 255).astype(np.uint8)
+        else:
+            stretched = arr.astype(np.uint8)
+
+        self.img_modified = Image.fromarray(stretched)
+        self.img_display = self.img_modified.copy()

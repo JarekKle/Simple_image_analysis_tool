@@ -12,6 +12,7 @@ from grayscale_image_handler import GrayscaleImageHandler
 class ImageManager:
     def __init__(self):
         self.handler = None
+        self.original_handler = None
 
     def load_image(self, img_name=None):
         if img_name is None:
@@ -35,6 +36,7 @@ class ImageManager:
                 raise TypeError(f"Nie udało się otworzyć obrazu: {e}")
 
         self._assign_handler(img)
+        self.original_handler = self.handler
         return self.handler.img_modified
 
     def replace_image(self, new_img):
@@ -49,6 +51,14 @@ class ImageManager:
     def save_image(self, img_name=None):
         return
 
+    def convert_to_grayscale(self):
+        new_handler = self.handler.convert_to_grayscale()
+        if new_handler is not self.handler:
+            self.handler = new_handler
+
+    def restore_original(self):
+        self.handler = self.original_handler
+        self.handler.restore_original()
     @staticmethod
     def is_image_grayscale(img):
         if img.mode == "L":

@@ -6,12 +6,14 @@ from PIL import ImageTk
 from coordinates import Coordinates
 from image_display import ImageDisplay
 from image_manager import ImageManager
+from image_processor import ImageProcessor
 
 
 class AppWindow:
-    def __init__(self, manager: ImageManager, display: ImageDisplay):
+    def __init__(self, manager: ImageManager, processor: ImageProcessor, display: ImageDisplay):
         self.manager = manager
         self.display = display
+        self.processor = processor
         self.master = Tk()
         self.photo = None
         self.current_pixel_rgb = (0, 0, 0)
@@ -40,9 +42,14 @@ class AppWindow:
         r, g, b = self.current_pixel_rgb
         x, y = self.real_pixel_coords
         zoom = self.display.zoom_factor
-        self.status_bar.config(
-            text=f"Zoom: {zoom}x | Pozycja: ({x}, {y}) | RGB: ({r}, {g}, {b})"
-        )
+        if self.manager.is_image_grayscale(self.manager.handler.img_modified):
+            self.status_bar.config(
+                text=f"Zoom: {zoom}x | Pozycja: ({x}, {y}) | RGB: {r}"
+            )
+        else:
+            self.status_bar.config(
+                text=f"Zoom: {zoom}x | Pozycja: ({x}, {y}) | RGB: ({r}, {g}, {b})"
+            )
 
     def update_window(self):
         self.update_image()
@@ -63,7 +70,7 @@ class AppWindow:
         self.real_pixel_coords = Coordinates(int(border_left.x + x // zoom), int(border_left.y + y // zoom))
 
     def change_pixel_color(self, event):
-        self.manager.handler.change_pixel_color(self.real_pixel_coords)
+        self.processor.change_pixel_color(self.real_pixel_coords)
         self.update_window()
 
     def _setup_window(self):
@@ -110,6 +117,9 @@ class AppWindow:
         self.button_restore_original = tk.Button(button_frame, text="Restore original image", width=18)
         self.button_restore_original.pack(side=tk.TOP, fill=tk.X, pady=2)
 
+        self.button_convert_to_grayscale = tk.Button(button_frame, text="Convert to grayscale", width=18)
+        self.button_convert_to_grayscale.pack(side=tk.TOP, fill=tk.X, pady=2)
+
         self.button_adjust_brightness = tk.Button(button_frame, text="Adjust brightness", width=18)
         self.button_adjust_brightness.pack(side=tk.TOP, fill=tk.X, pady=2)
 
@@ -149,6 +159,7 @@ class AppWindow:
         self.button_zoom_out.config(command=lambda: self.zoom(-1))
 
         self.button_restore_original.config(command=self.restore_original)
+        self.button_convert_to_grayscale.config(command=self.convert_to_grayscale)
         self.button_adjust_brightness.config(command=self.adjust_brightness)
         self.button_display_histogram.config(command=self.display_histogram)
         self.button_stretch_histogram.config(command=self.stretch_histogram)
@@ -157,31 +168,35 @@ class AppWindow:
         self.button_median_filter.config(command=self.median_filter)
 
     def restore_original(self):
-        self.manager.handler.restore_original()
+        self.manager.restore_original()
+        self.update_window()
+
+    def convert_to_grayscale(self):
+        self.manager.convert_to_grayscale()
         self.update_window()
 
     def adjust_brightness(self):
-        self.manager.handler.adjust_brightness()
+        self.processor.adjust_brightness()
         self.update_window()
 
     def display_histogram(self):
-        self.manager.handler.display_histogram()
+        self.processor.display_histogram()
         self.update_window()
 
     def stretch_histogram(self):
-        self.manager.handler.stretch_histogram()
+        self.processor.stretch_histogram()
         self.update_window()
 
     def equalize_histogram(self):
-        self.manager.handler.equalize_histogram()
+        self.processor.equalize_histogram()
         self.update_window()
 
     def linear_filters(self):
-        self.manager.handler.linear_filters()
+        self.processor.linear_filters()
         self.update_window()
 
     def median_filter(self):
-        self.manager.handler.median_filter()
+        self.processor.median_filter()
         self.update_window()
 
     def run(self):
