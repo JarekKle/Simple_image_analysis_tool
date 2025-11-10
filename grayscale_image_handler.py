@@ -47,3 +47,15 @@ class GrayscaleImageHandler(BaseImageHandler):
 
         self.img_modified = Image.fromarray(stretched)
         self.img_display = self.img_modified.copy()
+
+    def equalize_histogram(self):
+        arr = np.array(self.img_modified).astype(np.uint8)
+        equalized = self.equalize_channel(arr)
+        self.img_modified = Image.fromarray(equalized)
+        self.img_display = self.img_modified.copy()
+
+    def median_filter(self, size):
+        arr = np.array(self.img_modified).astype(np.uint8)
+        filtered = self.median_channel(arr, size)
+        self.img_modified = Image.fromarray(filtered)
+        self.img_display = self.img_modified.copy()

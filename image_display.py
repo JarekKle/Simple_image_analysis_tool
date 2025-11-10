@@ -13,7 +13,8 @@ class ImageDisplay:
         self.max_zoom = 10.0
         self.pan_step = 20
         self.border_left = Coordinates(0, 0)
-        self.wid_display, self.hei_display = self.manager.handler.img_display.size
+        self.wid_display = self.manager.handler.img_modified.width/self.zoom_factor
+        self.hei_display = self.manager.handler.img_modified.height/self.zoom_factor
         self.border_right = Coordinates(self.wid_display, self.hei_display)
         self.center = Coordinates(self.wid_display // 2, self.hei_display // 2)
 

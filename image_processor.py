@@ -19,3 +19,13 @@ class ImageProcessor:
 
     def stretch_histogram(self):
         self.manager.handler.stretch_histogram()
+
+    def equalize_histogram(self):
+        self.manager.handler.equalize_histogram()
+
+    def linear_filters(self):
+        self.manager.handler.linear_filters()
+
+    def median_filter(self):
+        size = self.manager.handler.ask_median_mask_size()
+        self.manager.handler.median_filter(size)

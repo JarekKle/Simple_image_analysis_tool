@@ -36,7 +36,7 @@ class AppWindow:
     def update_image(self):
         img = self.display.update_image()
         self.photo = ImageTk.PhotoImage(img)
-        self.image_label.config(image=self.photo)
+        self.image_label.create_image(0, 0, anchor="nw", image=self.photo)
 
     def update_status_bar(self):
         r, g, b = self.current_pixel_rgb
@@ -81,10 +81,12 @@ class AppWindow:
         self._setup_events()
 
     def _setup_canvas(self):
-        width, height = self.manager.handler.img_modified.size
-        self.photo = ImageTk.PhotoImage(self.manager.handler.img_modified)
-        self.image_label = tk.Label(self.master, image=self.photo, width=width, height=height)
+        img = self.manager.handler.img_modified
+        width, height = img.size
+        self.photo = ImageTk.PhotoImage(img)
+        self.image_label = tk.Canvas(self.master, width=width, height=height)
         self.image_label.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        self.image_label.create_image(0, 0, anchor="nw", image=self.photo)
 
     def _setup_controls(self):
         controls_frame = tk.Frame(self.master)

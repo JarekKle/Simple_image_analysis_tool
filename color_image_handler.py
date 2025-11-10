@@ -5,6 +5,7 @@ import numpy as np
 from base_image_handler import BaseImageHandler
 import tkinter as tk
 from PIL import Image
+
 from grayscale_image_handler import GrayscaleImageHandler
 
 
@@ -13,6 +14,7 @@ class ColorImageHandler(BaseImageHandler):
     def convert_to_grayscale(self):
         new_img = self.img_modified.convert("L")
         return GrayscaleImageHandler(new_img)
+
     def change_pixel_color(self, coords):
         root = tk.Toplevel()
         root.title("Wprowadź nowy kolor")
@@ -62,3 +64,20 @@ class ColorImageHandler(BaseImageHandler):
         self.img_modified = Image.fromarray(stretched)
         self.img_display = self.img_modified.copy()
 
+    def equalize_histogram(self):
+        arr = np.array(self.img_modified).astype(np.uint8)
+        equalized_channels = []
+        for i in range(3):
+            equalized_channels.append(self.equalize_channel(arr[..., i]))
+        equalized = np.stack(equalized_channels, axis=-1).astype(np.uint8)
+        self.img_modified = Image.fromarray(equalized)
+        self.img_display = self.img_modified.copy()
+
+    def median_filter(self, size):
+        arr = np.array(self.img_modified).astype(np.uint8)
+        filtered_channels = []
+        for i in range(3):
+            filtered_channels.append(self.median_channel(arr[..., i], size))
+        filtered = np.stack(filtered_channels, axis=-1)
+        self.img_modified = Image.fromarray(filtered)
+        self.img_display = self.img_modified.copy()
