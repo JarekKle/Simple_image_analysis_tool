@@ -1,6 +1,7 @@
 from tkinter import messagebox
 
 import numpy as np
+from matplotlib import pyplot as plt
 
 from base_image_handler import BaseImageHandler
 from coordinates import Coordinates
@@ -48,10 +49,24 @@ class GrayscaleImageHandler(BaseImageHandler):
         self.img_modified = Image.fromarray(stretched)
         self.img_display = self.img_modified.copy()
 
+    def display_histogram(self):
+        arr = np.array(self.img_modified).astype(np.uint8)
+        plt.figure("Histogram obrazu")
+        hist, bins = np.histogram(arr, bins=256, range=(0, 256))
+        plt.plot(bins[:-1], hist, color="black")
+        plt.title("Histogram czarny")
+        plt.show()
+
     def equalize_histogram(self):
         arr = np.array(self.img_modified).astype(np.uint8)
         equalized = self.equalize_channel(arr)
         self.img_modified = Image.fromarray(equalized)
+        self.img_display = self.img_modified.copy()
+
+    def linear_filter(self, kernel):
+        arr = np.array(self.img_modified).astype(np.uint8)
+        filtered = self.linear_filter_channel(arr, kernel)
+        self.img_modified = Image.fromarray(filtered)
         self.img_display = self.img_modified.copy()
 
     def median_filter(self, size):

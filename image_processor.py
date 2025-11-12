@@ -15,7 +15,11 @@ class ImageProcessor:
         self.manager.restore_original()
 
     def adjust_brightness(self):
-        self.manager.handler.adjust_brightness()
+        option = self.manager.handler.ask_adjust_brightness_option()
+        self.manager.handler.adjust_brightness(option)
+
+    def display_histogram(self):
+        self.manager.handler.display_histogram()
 
     def stretch_histogram(self):
         self.manager.handler.stretch_histogram()
@@ -23,8 +27,11 @@ class ImageProcessor:
     def equalize_histogram(self):
         self.manager.handler.equalize_histogram()
 
-    def linear_filters(self):
-        self.manager.handler.linear_filters()
+    def linear_filter(self):
+        kernel, convert_to_grayscale = self.manager.handler.ask_linear_filter_parameters()
+        if convert_to_grayscale:
+            self.convert_to_grayscale()
+        self.manager.handler.linear_filter(kernel)
 
     def median_filter(self):
         size = self.manager.handler.ask_median_mask_size()

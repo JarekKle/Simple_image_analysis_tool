@@ -166,7 +166,7 @@ class AppWindow:
         self.button_display_histogram.config(command=self.display_histogram)
         self.button_stretch_histogram.config(command=self.stretch_histogram)
         self.button_equalize_histogram.config(command=self.equalize_histogram)
-        self.button_linear_filters.config(command=self.linear_filters)
+        self.button_linear_filters.config(command=self.linear_filter)
         self.button_median_filter.config(command=self.median_filter)
 
     def restore_original(self):
@@ -193,8 +193,8 @@ class AppWindow:
         self.processor.equalize_histogram()
         self.update_window()
 
-    def linear_filters(self):
-        self.processor.linear_filters()
+    def linear_filter(self):
+        self.processor.linear_filter()
         self.update_window()
 
     def median_filter(self):
